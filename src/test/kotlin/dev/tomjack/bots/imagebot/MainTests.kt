@@ -1,4 +1,4 @@
-package dev.tomjack.examples.kotlinspringboottemplate
+package dev.tomjack.bots.imagebot
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

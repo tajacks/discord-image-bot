@@ -1,4 +1,4 @@
-package dev.tomjack.examples.kotlinspringboottemplate
+package dev.tomjack.bots.imagebot
 
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
