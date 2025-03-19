@@ -31,7 +31,7 @@ FROM amazoncorretto:21
 WORKDIR /app
 
 # Copy the built JAR from the build stage
-COPY --from=build /build/target/kotlin-springboot-template-0.1.0-SNAPSHOT.jar app.jar
+COPY --from=build /build/target/discord-image-bot-0.1.0-SNAPSHOT.jar app.jar
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
