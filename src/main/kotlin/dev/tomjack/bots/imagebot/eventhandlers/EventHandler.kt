@@ -1,4 +1,4 @@
-package dev.tomjack.bots.imagebot.listeners
+package dev.tomjack.bots.imagebot.eventhandlers
 
 import discord4j.core.event.domain.Event
 
