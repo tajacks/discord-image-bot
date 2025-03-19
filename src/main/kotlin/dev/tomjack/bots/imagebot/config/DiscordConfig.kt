@@ -2,7 +2,6 @@ package dev.tomjack.bots.imagebot.config
 
 import dev.tomjack.bots.imagebot.commands.CommandRegistrar
 import dev.tomjack.bots.imagebot.eventhandlers.EventHandler
-import dev.tomjack.bots.imagebot.extension.optional
 import dev.tomjack.bots.imagebot.extension.required
 import discord4j.core.DiscordClientBuilder
 import discord4j.core.GatewayDiscordClient
@@ -53,7 +52,7 @@ class DiscordConfig {
     ): CommandRegistrar =
         CommandRegistrar(
             restClient = restClient,
-            guildId = env.optional(DISCORD_GUILD_ID_KEY),
+            guildId = env.required(DISCORD_GUILD_ID_KEY),
         )
 
     @Bean

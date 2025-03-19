@@ -1,3 +1,3 @@
 # Discord Image Bot
 
-An AI Image bot for Discord
+An AI Image bot for Discord.
