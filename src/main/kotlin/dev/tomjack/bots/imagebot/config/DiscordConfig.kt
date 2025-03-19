@@ -1,12 +1,15 @@
 package dev.tomjack.bots.imagebot.config
 
+import dev.tomjack.bots.imagebot.commands.CommandRegistrar
+import dev.tomjack.bots.imagebot.eventhandlers.EventHandler
+import dev.tomjack.bots.imagebot.extension.optional
 import dev.tomjack.bots.imagebot.extension.required
-import dev.tomjack.bots.imagebot.listeners.EventHandler
 import discord4j.core.DiscordClientBuilder
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.Event
 import discord4j.gateway.intent.Intent
 import discord4j.gateway.intent.IntentSet
+import discord4j.rest.RestClient
 import kotlinx.coroutines.reactor.mono
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,7 +26,7 @@ class DiscordConfig {
         eventHandlers: List<EventHandler<*>>,
     ): GatewayDiscordClient =
         DiscordClientBuilder
-            .create(env.required(DISCORD_TOKEN_KEY))
+            .create(env.required(DISCORD_TOKEN_PROPERTY))
             .build()
             .gateway()
             .setEnabledIntents(IntentSet.of(Intent.GUILD_MESSAGES))
@@ -38,7 +41,31 @@ class DiscordConfig {
             }.login()
             .block()!! // TODO investigate this
 
+    @Bean
+    @Profile("!test")
+    fun restDiscordClient(gatewayDiscordClient: GatewayDiscordClient): RestClient = gatewayDiscordClient.rest()
+
+    @Bean
+    @Profile("local && !test")
+    fun commandRegistrarGuild(
+        env: Environment,
+        restClient: RestClient,
+    ): CommandRegistrar =
+        CommandRegistrar(
+            restClient = restClient,
+            guildId = env.optional(DISCORD_GUILD_ID_KEY),
+        )
+
+    @Bean
+    @Profile("!local && !test")
+    fun commandRegistrarGlobal(restClient: RestClient): CommandRegistrar =
+        CommandRegistrar(
+            restClient = restClient,
+            guildId = null,
+        )
+
     companion object {
-        private const val DISCORD_TOKEN_KEY = "dev.tomjack.bots.imagebot.discord.token"
+        private const val DISCORD_GUILD_ID_KEY = "dev.tomjack.bots.imagebot.discord.guildId"
+        private const val DISCORD_TOKEN_PROPERTY = "dev.tomjack.bots.imagebot.discord.token"
     }
 }
