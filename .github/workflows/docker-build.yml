@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build, Push and Deploy Docker Image
 
 on:
   push:
@@ -60,3 +60,38 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Deploy
+  deploy-to-vm:
+    needs: build-and-push
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Create isolated directory for this application
+            mkdir -p ~/apps/${{ github.repository }}
+            
+            # Create application-specific .env file
+            cat > ~/apps/${{ github.repository }}/.env << EOF
+            DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}
+            FIREWORKS_TOKEN=${{ secrets.FIREWORKS_TOKEN }}
+            EOF
+            
+            # Pull and run with environment variables
+            docker pull ghcr.io/${{ github.repository }}:latest
+            docker stop ${{ github.repository }} || true
+            docker rm ${{ github.repository }} || true
+            docker run -d \
+              --name ${{ github.repository }} \
+              --env-file ~/apps/${{ github.repository }}/.env \
+              ghcr.io/${{ github.repository }}:latest
+            
+            docker system prune -f
