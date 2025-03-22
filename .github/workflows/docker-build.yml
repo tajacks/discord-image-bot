@@ -94,8 +94,8 @@ jobs:
             
             # Pull and run with environment variables
             docker pull ghcr.io/${{ github.repository }}:latest
-            docker stop ${{ github.repository }} || true
-            docker rm ${{ github.repository }} || true
+            docker stop $REPO_NAME || true
+            docker rm $REPO_NAME || true
             docker run -d \
               --name $REPO_NAME \
               --env-file ~/apps/${{ github.repository }}/.env \
