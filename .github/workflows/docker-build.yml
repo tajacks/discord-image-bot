@@ -68,6 +68,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - name: Extract repo name
+        id: repo_name
+        run: |
+          REPO_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
@@ -75,6 +81,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
+          envs: REPO_NAME
           script: |
             # Create isolated directory for this application
             mkdir -p ~/apps/${{ github.repository }}
@@ -90,7 +97,7 @@ jobs:
             docker stop ${{ github.repository }} || true
             docker rm ${{ github.repository }} || true
             docker run -d \
-              --name ${{ github.repository }} \
+              --name $REPO_NAME \
               --env-file ~/apps/${{ github.repository }}/.env \
               ghcr.io/${{ github.repository }}:latest
             
