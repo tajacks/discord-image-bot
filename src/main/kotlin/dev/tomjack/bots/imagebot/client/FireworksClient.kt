@@ -25,8 +25,8 @@ class FireworksClient(
                     FireworksRequest(
                         prompt = prompt,
                         aspectRatio = "16:9",
-                        guidanceScale = 3.5,
-                        numInferenceSteps = 23,
+                        guidanceScale = 7.5,
+                        numInferenceSteps = 30,
                         seed = Random.nextLong(0, 1000000),
                     ),
                 )
